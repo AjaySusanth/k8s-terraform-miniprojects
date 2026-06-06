@@ -1,0 +1,1 @@
+FROM ghcr.io/stefanprodan/podinfo:6.4.0
