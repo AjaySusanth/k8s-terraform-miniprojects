@@ -26,7 +26,7 @@ jobs:
 
       - name: Login to Acr
         run: |
-          az acr login --name ${{ var.ACR_NAME }}
+          az acr login --name ${{ vars.ACR_NAME }}
       
       - name: Build and Push Docker Image
         run: |
@@ -41,7 +41,7 @@ jobs:
 
       - name: Update Helm values.yaml
         run: |
-          yq -i '.image.repository = "${{ var.ACR_NAME }}.azureacr.io/podinfo"' charts/podinfo/values.yaml
+          yq -i '.image.repository = "${{ vars.ACR_NAME }}.azurecr.io/podinfo"' charts/podinfo/values.yaml
 
           yq -i '.image.tag = "${{ env.tag }}"' charts/podinfo/values.yaml
 
