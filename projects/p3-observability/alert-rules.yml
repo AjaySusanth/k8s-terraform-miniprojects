@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+
+metadata:
+  name: podinfo-alerts
+  namespace: monitoring
+  labels:
+    release: prometheus
+
+spec:
+  groups:
+  - name: podinfo.rules
+    rules:
+    - alert: PodinfoHighErrorRate
+      expr: |
+        sum(rate(http_requests_total{container="podinfo", status=~"5.*"}[2m]))
+        /
+        sum(rate(http_requests_total{container="podinfo"}[2m]))
+        * 100 > 1
+      for: 30s
+      labels:
+        severity: critical
+      annotations:
+        summary: "High error rate on Podinfo"
+        description: "Podinfo HTTP 5xx error rate is above 1% for more than 30 seconds."

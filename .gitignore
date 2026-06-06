@@ -1,0 +1,21 @@
+# Local Terraform files and state
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+
+# Kubernetes Kubeconfigs and credentials
+aks_kubeconfig
+kubeconfig
+*.kubeconfig
+
+# Helm temporary files
+charts/*/charts/
+charts/*/tmp/
+
+# IDE/OS files
+.vscode/
+.idea/
+.DS_Store

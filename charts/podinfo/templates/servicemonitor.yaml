@@ -1,0 +1,17 @@
+{{- if .Values.monitoring.enabled }}   
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "podinfo.fullname" . }}
+  labels:
+    {{- include "podinfo.labels" . | nindent 4 }}
+    release: prometheus                # 👈 Ties this monitor to the cluster's Prometheus operator
+spec:
+  selector:
+    matchLabels:
+      {{- include "podinfo.selectorLabels" . | nindent 6 }}
+  endpoints:
+    - port: http                       # 👈 Matches the port name in service.yaml
+      path: /metrics
+      interval: {{ .Values.monitoring.interval }} # Grabs interval from values.yaml (default: 15s)
+{{- end }}

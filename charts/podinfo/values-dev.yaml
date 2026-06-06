@@ -1,0 +1,27 @@
+# Dev Environment: Optimize for cost using Spot Nodes
+resources:
+  requests:
+    cpu: 300m          # Higher CPU requests so we can trigger HPA scaling easily
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 128Mi
+
+# Allow scheduling on Spot nodes (tolerates the spot taint)
+tolerations:
+  - key: "kubernetes.azure.com/scalesetpriority"
+    operator: "Equal"
+    value: "spot"
+    effect: "NoSchedule"
+
+# Prefer Spot nodes over regular nodes to save cost in Dev
+affinity:
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+            - key: "kubernetes.azure.com/scalesetpriority"
+              operator: "In"
+              values:
+                - "spot"

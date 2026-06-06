@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+
+metadata:
+  name: podinfo-monitor
+  namespace: monitoring
+  labels: 
+    release: prometheus
+
+spec: 
+  selector:
+    matchLabels:
+      app: podinfo
+
+  namespaceSelector:
+    any: true
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s

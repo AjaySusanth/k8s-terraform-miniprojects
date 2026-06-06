@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: podinfo-dev
+  namespace: argocd
+
+spec:
+  project: default
+  source:
+    repoUrl: 'https://github.com/AjaySusanth/k8s-terraform-miniprojects.git'
+    targetRevision: HEAD 
+    path: charts/podinfo
+    helm:
+      valueFiles:
+        - values-dev.yaml
+  destination:
+    server: 'https://kubernetes.default.svc'  # Deploy to the same cluster ArgoCD is running on
+    namespace: dev
+
+  syncPolicy:
+    automated: # enable auto-syncing
+      prune: true  # Delete resources that are removed from Git
+      selfHeal: true  # Revert any manual 'kubectl' edits to match Git
+    syncOptions:
+      - CreateNamespace=true # Automatically create the 'dev' namespace if it doesn't exist
+
+

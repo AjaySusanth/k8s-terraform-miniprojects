@@ -1,0 +1,65 @@
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1024Mi
+    
+    storageSpec:
+      emptyDir:
+        medium: ""
+    #What: Tells Prometheus to store its time-series data on a temporary folder on the node's local disk (emptyDir) instead of dynamically provisioning a dedicated Azure Managed Disk (Persistent Volume).
+    #Why: emptyDir is 100% free — it uses existing node disk space. A new Azure PVC would provision a new disk costing you credits 24/7. For a dev lab, this is the right trade-off.
+    #The trade-off: The data is lost if the Prometheus pod is deleted or rescheduled to a different node. For production, you would absolutely use a proper PVC here.
+
+
+#What: Sets resource budgets for AlertManager — the component that receives firing alerts from Prometheus and routes them (e.g., sending a PagerDuty notification or a Slack message).
+#Why small: AlertManager is a very lightweight router. It doesn't crunch numbers, so 50m CPU and 64Mi memory is more than enough.
+alertmanager:
+  alertmanagerSpec:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+#What: Sets resource budgets for Grafana — the component that provides the visual dashboards you will use to see your graphs.
+grafana:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 100Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  
+# The Node Exporter is a tiny DaemonSet pod that runs on every single node in your cluster. Its job is to collect low-level OS metrics from the VM itself — disk I/O, network bytes sent/received, CPU steal time, etc. 
+
+#Why it matters: This is how you see metrics about the machine (node) rather than just the application (pod).
+
+prometheus-node-exporter:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 30Mi
+    limits:
+      cpu: 100m
+      memory: 50Mi
+
+
+# Kube-State-Metrics talks directly to the Kubernetes API Server and converts cluster state into metrics. It tells Prometheus things like: "How many replicas does the vote deployment currently have?", "Is this PVC in a Bound or Pending state?", "How many pods are in a CrashLoopBackOff condition?"
+
+#Why it matters: This is how Grafana shows you Kubernetes-specific health dashboards.
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 50Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi

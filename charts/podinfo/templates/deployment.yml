@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "podinfo.fullname" . }}    # Calls our helper to generate a unique name
+  labels:
+    {{- include "podinfo.labels" . | nindent 4 }} # Injects standard labels and indents them by 4 spaces
+spec:
+  # If autoscaling is enabled, let HPA control replicas. Otherwise, use values.yaml count.
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "podinfo.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "podinfo.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          # Dynamically builds the image tag using values.yaml, falling back to appVersion in Chart.yaml
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 9898
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 9898
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 9898
+            periodSeconds: 10
+          resources:
+            # Converts the resources section from values.yaml directly into YAML here
+            {{- toYaml .Values.resources | nindent 12 }}
+      
+      # Inject Spot node scheduling configs if specified in values file (like values-dev.yml)
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
