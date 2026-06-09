@@ -1,0 +1,37 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dev-deployer-role
+  namespace: dev
+
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "services", "configmaps"]
+    verbs: ["get", "list", "watch","update","create","delete","patch"]
+    
+  # Rule 2: App workloads (Deployments, StatefulSets, DaemonSets)
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets", "daemonsets", "replicasets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # Rule 3: Ingress/Routing
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dev-deployer-binding
+  namespace: dev
+
+subjects:
+  - kind: User
+    name: deployer-user@company.com
+    apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  kind: Role
+  name: dev-deployer-role
+  apiGroup: rbac.authorization.k8s.io

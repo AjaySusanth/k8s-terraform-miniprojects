@@ -11,7 +11,8 @@ This repository contains a progressive series of production-grade Kubernetes dep
 | **[P3 — Observability](./projects/p3-observability)** | Prometheus, Grafana & traffic shaping | ✅ Complete | Prometheus, Grafana, K6 | ServiceMonitor CRDs, custom latency/RPS dashboard, K6 load testing, Alertmanager alerting |
 | **[P4 — Autoscaling](./projects/p3-observability)** | Cost-optimization & scale-out resilience | ✅ Complete | HPA, Spot Nodes, PDB | Horizontal Pod Autoscalers, Azure Spot VM node pools, Pod Disruption Budgets, Spot tolerations |
 | **[P5 — Helm & GitOps](./charts/podinfo)** | Packaging, OIDC pipelines & ArgoCD | ✅ Complete | Helm, ArgoCD, GitHub Actions | Modular Helm charts, GitHub Actions CI/CD with Azure Federated Credentials (OIDC), Dev/Prod ArgoCD sync gates |
-| **P6 — Zero Trust Security** | Network policies, RBAC & secure secrets | ⏳ Next Up | Calico NetPol, Azure Key Vault | Namespace default-deny policies, microservice ingress/egress whitelisting, Key Vault CSI Driver |
+| **[P6 — Zero Trust Security](./projects/p6-security)** | Network policies, RBAC & secure secrets | ✅ Complete | Calico NetPol, Azure Key Vault | Namespace default-deny policies, microservice ingress/egress whitelisting, Key Vault CSI Driver |
+
 
 ---
 
