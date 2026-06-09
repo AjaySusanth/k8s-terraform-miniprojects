@@ -32,7 +32,11 @@ resource "azurerm_kubernetes_cluster" "aks" {
     }
     oms_agent {
       log_analytics_workspace_id = azurerm_log_analytics_workspace.aks_logs.id
+    }
 
+    # Enable Azure Key Vault Secrets Provider add-on
+    key_vault_secrets_provider {
+      secret_rotation_enabled = true
     }
 }
 

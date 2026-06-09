@@ -13,3 +13,13 @@ output "acr_login_server" {
   value       = module.acr.login_server
   description = "The login URL for the private Container Registry"
 }
+
+output "key_vault_name" {
+  value       = azurerm_key_vault.kv.name
+  description = "The name of the provisioned Azure Key Vault"
+}
+
+output "kubelet_identity_client_id" {
+  value       = module.aks-cluster.kubelet_identity_client_id
+  description = "The Client ID of the AKS Kubelet identity"
+}

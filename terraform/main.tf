@@ -82,3 +82,48 @@ resource "azurerm_role_assignment" "github_to_acr" {
   role_definition_name = "AcrPush"
   scope = module.acr.acr_id
 }
+
+
+#Fetch current subsription and tenant
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_key_vault" "kv" {
+  name = "boutiquekv-${random_string.suffix.result}"
+  resource_group_name = azurerm_resource_group.infra_rg.name
+  location = azurerm_resource_group.infra_rg.location
+  tenant_id = data.azurerm_client_config.current.tenant_id
+  sku_name = "standard"
+  soft_delete_retention_days = 7
+  purge_protection_enabled = false
+  
+}
+
+resource "azurerm_key_vault_access_policy" "deployer" {
+  key_vault_id = azurerm_key_vault.kv.id
+  tenant_id = data.azurerm_client_config.current.tenant_id
+  object_id = data.azurerm_client_config.current.object_id
+  secret_permissions = [ "Get", "List", "Set", "Delete", "Purge" ]
+}
+
+resource "azurerm_key_vault_access_policy" "aks" {
+  key_vault_id = azurerm_key_vault.kv.id
+  tenant_id  = data.azurerm_client_config.current.tenant_id
+  object_id  = module.aks-cluster.kubelet_identity_object_id
+  secret_permissions = ["Get", "List"]
+}
+
+resource "random_password" "redis" {
+  length  = 20
+  special = true
+}
+
+resource "azurerm_key_vault_secret" "redis_password" {
+  name  = "redis-password"
+  value = random_password.redis.result 
+  key_vault_id = azurerm_key_vault.kv.id
+  depends_on = [azurerm_key_vault_access_policy.deployer]
+}
+
+
+
+
