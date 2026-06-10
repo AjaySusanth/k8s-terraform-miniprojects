@@ -10,6 +10,7 @@ crash.log
 aks_kubeconfig
 kubeconfig
 *.kubeconfig
+credentials-velero
 
 # Helm temporary files
 charts/*/charts/
@@ -19,3 +20,4 @@ charts/*/tmp/
 .vscode/
 .idea/
 .DS_Store
+

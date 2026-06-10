@@ -124,6 +124,18 @@ resource "azurerm_key_vault_secret" "redis_password" {
   depends_on = [azurerm_key_vault_access_policy.deployer]
 }
 
+resource "azurerm_storage_account" "velero" {
+  name = "velerobackup${random_string.suffix.result}"
+  resource_group_name = azurerm_resource_group.infra_rg.name
+  location = azurerm_resource_group.infra_rg.location
+  account_tier = "Standard"
+  account_replication_type = "LRS"
+}
 
+resource "azurerm_storage_container" "velero_container" {
+  name = "velero-backups"
+  storage_account_name = azurerm_storage_account.velero.name
+  container_access_type = "private"
+}
 
 

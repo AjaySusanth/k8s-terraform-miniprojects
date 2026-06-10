@@ -4,38 +4,6 @@ This project demonstrates the implementation of a resilient stateful architectur
 
 ---
 
-## 🏗️ Architecture Overview
-
-The system architecture consists of a stateful application layer and a backup/restoration management plane:
-
-```mermaid
-graph TD
-    subgraph AKS Cluster (Linux Nodes)
-        direction TB
-        subgraph default Namespace
-            redis-0[Pod: redis-0] --- pvc-0[(PVC: redis-data-redis-0)]
-            redis-1[Pod: redis-1] --- pvc-1[(PVC: redis-data-redis-1)]
-            redis-2[Pod: redis-2] --- pvc-2[(PVC: redis-data-redis-2)]
-            headless[Headless Service: redis]
-        end
-        subgraph velero Namespace
-            velero-server[Velero Deployment]
-            node-agent[node-agent DaemonSet]
-        end
-    end
-
-    subgraph Azure Cloud Infrastructure (dev-k8s-rg)
-        sa[(Storage Account: velerobackupf0hnum)]
-        blob[Blob Container: velero-backups]
-        sa --- blob
-    end
-
-    node-agent -.->|Read/Mount files directly| pvc-0
-    node-agent -.->|Read/Mount files directly| pvc-1
-    node-agent -.->|Read/Mount files directly| pvc-2
-    velero-server ===>|Backup/Restore Tarballs| blob
-```
-
 ### Key Components:
 1. **StatefulSet (`redis`)**: Spawns 3 replicas (`redis-0`, `redis-1`, `redis-2`) with stable ordinal numbers and network identities.
 2. **Headless Service (`redis` with `clusterIP: None`)**: Couples with CoreDNS to map individual stable names (e.g. `redis-1.redis.default.svc.cluster.local`) directly to pod IPs for peer discovery.
